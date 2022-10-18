@@ -1,13 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using RepositoryPattern.Core;
+using RepositoryPattern.RepositoryPattern.Domain.Core.Repositories;
 
-namespace RepositoryPattern.Repositories
+namespace RepositoryPattern.RepositoryPattern.Data.Repositories
 {
     public class ProductRepository : IProductRepository
     {
-        public List<Product> products { get; set; }
+        private MyDbContext context;
+        private DbSet<Product> products;
+
+        public ProductRepository(MyDbContext context) {
+            this.context = context;
+            this.products = context.Set<Product>();
+        }
 
         public bool Create(Product entity) {
             products.Add(entity);
@@ -15,7 +22,7 @@ namespace RepositoryPattern.Repositories
         }
 
         public bool Delete(int id) {
-            Product product = products.FirstOrDefault(e => e.Id == id);
+            Product product = products.Find(id);
             if (product != null)
             {
                 products.Remove(product);
@@ -32,16 +39,12 @@ namespace RepositoryPattern.Repositories
             return products;
         }
 
-        public int GetStock(Product product) {
+        public int GetNumProdcuts() {
             return products.Count(); ;
         }
 
         public bool Update(Product entity) {
-            var index = products.FindIndex(e => e.Id == entity.Id);
-            if (index > -1)
-            {
-                products[index] = entity;
-            }
+            products.Update(entity);
             return true;
         }
     }
